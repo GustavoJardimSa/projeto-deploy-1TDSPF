@@ -5,6 +5,8 @@ import CardProduto from "../../components/CardProduto";
 import { FaEdit as Editar } from "react-icons/fa";
 import { MdDeleteForever as Excluir } from "react-icons/md";
 
+const API_URL = "https://script.google.com/macros/s/AKfycbx8mFm8XIYJ7HqnvOR6rV6iQF29RwB0HBqWjUdsmwOY1T4nrlKPQvNfCiRbSy8QlGkd/exec";
+
 export default function Produtos() {
   // Para alterar o título da página:
   document.title = "Produtos";
@@ -16,15 +18,20 @@ export default function Produtos() {
   useEffect(() => {
     const carregaProdutos = async () => {
       try {
-        const response = await fetch("http://localhost:3001/produtos");
-
+        //const response = await fetch("http://localhost:3001/produtos");
+        const response = await fetch(API_URL);
         if (!response.ok) {
           throw new Error(
             `Erro na listagem dos produtos: ${response.status} - ${response.statusText}`,
           );
         }
 
-        const data: TipoProduto[] = await response.json();
+        const {data, status} = await response.json();
+
+        if (status === "error") {
+          throw new Error (`Erro na listagem dos produtos: ${data}`);
+        }
+
         setProdutos(data);
       } catch (error) {
         console.error(error);
@@ -85,7 +92,7 @@ export default function Produtos() {
               <th>ID</th>
               <th>NOME</th>
               <th>PREÇO</th>
-              <th>DESCRIÇÃO</th>
+              <th>ESTOQUE</th>
               <th>AVATAR</th>
               <th>AÇÕES</th>
             </tr>
@@ -96,6 +103,7 @@ export default function Produtos() {
                 <td>{produto.id}</td>
                 <td>{produto.nome}</td>
                 <td>{produto.preco}</td>
+                <td>{produto.estoque}</td>
                 <td>{produto.avatar}</td>
                 <td>
                   <img src={produto.avatar} alt={produto.nome} width={40} />
